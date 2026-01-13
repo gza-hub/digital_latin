@@ -1,0 +1,28 @@
+[
+  { "type": "tf", "q": "Aqua = víz.", "correct": true },
+
+  { "type": "mcq",
+    "q": "Ignis jelentése:",
+    "options": ["tűz", "kő", "út"],
+    "correct": 0
+  },
+
+  { "type": "grouping",
+    "q": "Csoportosítsd a szavakat!",
+    "groups": ["Főnév", "Ige"],
+    "items": [
+      { "id": "aqua", "text": "aqua", "group": "Főnév" },
+      { "id": "amat", "text": "amat", "group": "Ige" }
+    ]
+  },
+
+  { "type": "ordering",
+    "q": "Rakd helyes sorrendbe!",
+    "items": [
+      { "id": "1", "text": "Puella" },
+      { "id": "2", "text": "rosam" },
+      { "id": "3", "text": "videt" }
+    ],
+    "answerOrder": ["1", "2", "3"]
+  }
+]

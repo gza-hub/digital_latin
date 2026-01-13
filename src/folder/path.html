@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tanulási út választása</title>
+  <link rel="stylesheet" href="path.css" />
+</head>
+<body>
+
+  
+  <!-- bal felso gomb; később avatar választás; bal oldlai menubar; monoton latin zene; stb -->
+  <a class="corner-btn" href="index.html" title="Vissza a loginhoz">C</a>
+
+  <main class="screen">
+    <section class="choices" aria-label="Tanulási út választása">
+      <button class="choice-card" id="pveCard" type="button" aria-label="Egyéni út (PVE) választása">
+        <div class="card-title">Egyéni út</div>
+        <div class="card-subtitle">PVE</div>
+      </button>
+
+      <button class="choice-card" id="groupCard" type="button" aria-label="Csoportos út választása">
+        <div class="card-title">Csoportos út</div>
+        <div class="card-subtitle">PVP</div>
+      </button>
+    </section>
+  </main>
+
+  <!-- majd a menubarba rakni -->
+  <div class="bottom-left">
+    <button class="icon-btn" type="button" id="backBtn" title="Vissza">↩</button>
+  </div>
+
+  <script>
+    // KATTINTÁS → továbbnavigálás
+    document.getElementById("pveCard").addEventListener("click", () => {
+      window.location.href = "pve.html";
+    });
+
+    document.getElementById("groupCard").addEventListener("click", () => {
+      window.location.href = "group.html";
+    });
+
+    // Vissza gomb
+    document.getElementById("backBtn").addEventListener("click", () => {
+      window.history.back();
+    });
+
+    
+    const cards = document.querySelectorAll(".choice-card");
+
+    cards.forEach(card => {
+      card.addEventListener("mousemove", (e) => {
+        const r = card.getBoundingClientRect();
+        const x = e.clientX - r.left;
+        const y = e.clientY - r.top;
+
+        // -1..1 tartomány
+        const nx = (x / r.width) * 2 - 1;
+        const ny = (y / r.height) * 2 - 1;
+
+        // enyhe döntés
+        const rotateY = nx * 6;  // fok
+        const rotateX = -ny * 6; // fok
+
+        card.style.transform = `translateY(-10px) scale(1.02) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      });
+
+      card.addEventListener("mouseleave", () => {
+        card.style.transform = "";
+      });
+    });
+  </script>
+</body>
+</html>

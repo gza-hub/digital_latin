@@ -1,0 +1,14 @@
+{
+  "id": "city1",
+  "title": "I. Város – Alapok",
+  "dictionaryFile": "data/dict_city1.json",
+  "tasksFile": "data/tasks_city1.json",
+  "exam": {
+    "passScore": 2,
+    "questions": [
+      { "type": "mcq", "q": "Mit jelent: aqua?", "options": ["tűz", "víz", "föld"], "correct": 1 },
+      { "type": "tf", "q": "A latinban van névelő.", "correct": false },
+      { "type": "mcq", "q": "Mit jelent: terra?", "options": ["föld", "ég", "víz"], "correct": 0 }
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "cities": [
+    { "id": "city1", "name": "I. Város", "x": 18, "y": 62, "next": ["city2"] },
+    { "id": "city2", "name": "II. Város", "x": 45, "y": 48, "next": ["city3"] },
+    { "id": "city3", "name": "III. Város", "x": 72, "y": 58, "next": ["city4"] }
+  ]
+}

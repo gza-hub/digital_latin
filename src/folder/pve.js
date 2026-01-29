@@ -20,6 +20,8 @@ const state = {
   progress: null         // mentett haladás objektum
 };
 
+let mapResizeObserver = null;
+
 /* -----------------------------
    DOM elemek gyors elérése
 ------------------------------ */
@@ -53,6 +55,7 @@ async function init() {
   try {
     state.progress = loadProgress();
     state.map = await fetchJson(MAP_FILE);
+    await loadMapImageNaturalSize();
 
     // ✅ védőellenőrzés
     if (!state.map || !Array.isArray(state.map.cities)) {
@@ -68,6 +71,8 @@ async function init() {
     console.error(err);
     openModal("Hiba", `<p>${escapeHtml(err.message)}</p><p>Nézd meg a Console-t (F12) részletekért.</p>`);
   }
+
+  mapResizeObserver.observe(elMapWrap);
 }
 
 /* -----------------------------
@@ -130,32 +135,88 @@ function showView(view) {
 /* -----------------------------
    TÉRKÉP kirajzolás
 ------------------------------ */
+
+const elMapWrap = document.getElementById("mapWrap");
+
+let mapImgNatural = null; // { w, h }
+
+function getBgImageUrl(el) {
+  const bg = getComputedStyle(el).backgroundImage; // url("...")
+  const m = bg.match(/url\(["']?(.*?)["']?\)/i);
+  return m ? m[1] : null;
+}
+
+async function loadMapImageNaturalSize() {
+  const url = getBgImageUrl(elMapWrap);
+  if (!url) throw new Error("Nem található háttérkép a .map-wrap elemhez.");
+
+  const img = new Image();
+  img.src = url;
+  await img.decode(); // waits until dimensions are known
+  mapImgNatural = { w: img.naturalWidth, h: img.naturalHeight };
+}
+
+function getContainedRect(containerW, containerH, imgW, imgH) {
+  // background-size: contain
+  const scale = Math.min(containerW / imgW, containerH / imgH);
+  const w = imgW * scale;
+  const h = imgH * scale;
+  const x = (containerW - w) / 2; // background-position: center
+  const y = (containerH - h) / 2;
+  return { x, y, w, h };
+}
+
+
+
 function renderMap() {
-  // régi pontok törlése
   elMapLayer.innerHTML = "";
 
+  // container size in CSS pixels
+  const wrapRect = elMapWrap.getBoundingClientRect();
+
+  // contained image rect inside the wrapper
+  const imgRect = getContainedRect(
+      wrapRect.width,
+      wrapRect.height,
+      mapImgNatural.w,
+      mapImgNatural.h
+  );
+
   for (const c of state.map.cities) {
-    const status = getCityStatus(c.id); // open / locked / done
+    const status = getCityStatus(c.id);
 
     const node = document.createElement("div");
     node.className = `city-node ${status}`;
-    node.style.left = `${c.x}%`;
-    node.style.top = `${c.y}%`;
 
-    // kis felirat
+    // IMPORTANT:
+    // Treat c.x/c.y as % of the MAP IMAGE (not the wrapper).
+    // If your map.json currently stores 0..100, convert to 0..1:
+    const rx = (c.x ?? 0) / 100;
+    const ry = (c.y ?? 0) / 100;
+
+    const px = imgRect.x + rx * imgRect.w;
+    const py = imgRect.y + ry * imgRect.h;
+
+    node.style.left = `${px}px`;
+    node.style.top = `${py}px`;
+
     const label = document.createElement("div");
     label.className = "city-label";
     label.textContent = c.name;
     node.appendChild(label);
 
     node.addEventListener("click", () => {
-      if (status === "locked") return; // zárt városra ne lehessen menni
+      if (status === "locked") return;
       enterCity(c.id);
     });
 
     elMapLayer.appendChild(node);
   }
 }
+
+new ResizeObserver(() => {
+  if (state.view === "map") renderMap();
+}).observe(elMapWrap);
 
 /* -----------------------------
    VÁROS belépés

@@ -73,6 +73,8 @@ body{
 }
 .map-layer {
     outline: 2px dashed red;
+    position: absolute;
+    inset: 0;
 }
 
 /* város pont */
